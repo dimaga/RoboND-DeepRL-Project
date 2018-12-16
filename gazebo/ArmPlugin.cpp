@@ -37,7 +37,7 @@
 
 #define INPUT_WIDTH   512
 #define INPUT_HEIGHT  512
-#define NUM_ACTIONS 6
+#define NUM_ACTIONS (DOF*2)
 #define OPTIMIZER "Adam"
 #define LEARNING_RATE 0.01f
 #define REPLAY_MEMORY 10000
@@ -317,7 +317,7 @@ bool ArmPlugin::updateAgent()
   /
   */
   
-  float velocity = 0.0; // TODO - Set joint velocity based on whether action is even or odd.
+  float velocity = vel[action/2] + ((action & 1) ? actionVelDelta : -actionVelDelta);
 
   if( velocity < VELOCITY_MIN )
     velocity = VELOCITY_MIN;
@@ -348,7 +348,7 @@ bool ArmPlugin::updateAgent()
   / TODO - Increase or decrease the joint position based on whether the action is even or odd
   /
   */
-  float joint = 0.0; // TODO - Set joint position based on whether action is even or odd.
+  float joint = ref[action/2] + ((action & 1) ? actionJointDelta : -actionJointDelta);
 
   // limit the joint to the specified range
   if( joint < JOINT_MIN )
