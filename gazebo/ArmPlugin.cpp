@@ -16,7 +16,7 @@
 #define JOINT_MAX  2.0f
 
 // Turn on velocity based control
-#define VELOCITY_CONTROL true
+#define VELOCITY_CONTROL false
 #define VELOCITY_MIN -0.2f
 #define VELOCITY_MAX  0.2f
 
@@ -605,7 +605,7 @@ void ArmPlugin::OnUpdate(const common::UpdateInfo& updateInfo)
         // compute the smoothed moving average of the delta of the distance to the goal
         const float Alpha = 0.3f;
         avgGoalDelta  = avgGoalDelta * Alpha + distDelta * (1.0 - Alpha);
-        rewardHistory = avgGoalDelta;
+        rewardHistory = 0.1f * avgGoalDelta;
         newReward     = true; 
       }
 
