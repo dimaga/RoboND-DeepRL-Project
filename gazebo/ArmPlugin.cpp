@@ -132,24 +132,20 @@ void ArmPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf*/)
   this->j2_controller = new physics::JointController(model);
 
   // Create our node for camera communication
-  cameraNode->Init();
+  this->cameraNode->Init();
   
-  cameraNode->Subscribe(
+  this->cameraSub = this->cameraNode->Subscribe(
     "/gazebo/arm_world/camera/link/camera/image",
     &ArmPlugin::onCameraMsg,
     this);
 
-  //cameraSub = None;
-
   // Create our node for collision detection
-  collisionNode->Init();
+  this->collisionNode->Init();
     
-  collisionNode->Subscribe(
+  this->collisionSub = this->collisionNode->Subscribe(
     "/gazebo/arm_world/tube/tube_link/my_contact",
     &ArmPlugin::onCollisionMsg,
     this);
-
-  //collisionSub = None;
 
   // Listen to the update event. This event is broadcast every simulation iteration.
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(boost::bind(&ArmPlugin::OnUpdate, this, _1));
