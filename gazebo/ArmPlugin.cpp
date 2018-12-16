@@ -16,7 +16,7 @@
 #define JOINT_MAX  2.0f
 
 // Turn on velocity based control
-#define VELOCITY_CONTROL false
+#define VELOCITY_CONTROL true
 #define VELOCITY_MIN -0.2f
 #define VELOCITY_MAX  0.2f
 
@@ -31,22 +31,22 @@
 #define EPS_DECAY 200
 
 /*
-/ TODO - Tune the following hyperparameters
+/ Tune the following hyperparameters
 /
 */
 
-#define INPUT_WIDTH   512
-#define INPUT_HEIGHT  512
+#define INPUT_WIDTH 64
+#define INPUT_HEIGHT 64
 #define NUM_ACTIONS (DOF*2)
 #define OPTIMIZER "Adam"
 #define LEARNING_RATE 0.01f
 #define REPLAY_MEMORY 10000
-#define BATCH_SIZE 8
-#define USE_LSTM false
-#define LSTM_SIZE 32
+#define BATCH_SIZE 32
+#define USE_LSTM true
+#define LSTM_SIZE 8
 
 /*
-/ TODO - Define Reward Parameters
+/ Define Reward Parameters
 /
 */
 
@@ -67,7 +67,7 @@
 #define ANIMATION_STEPS 1000
 
 // Set Debug Mode
-#define DEBUG true
+#define DEBUG false
 
 // Lock base rotation DOF (Add dof in header file if off)
 #define LOCKBASE true
@@ -253,12 +253,12 @@ void ArmPlugin::onCollisionMsg(ConstContactsPtr &contacts)
 
   
     /*
-    / TODO - Check if there is collision between the arm and object, then issue learning reward
+    / Check if there is collision between the arm and object, then issue learning reward
     /
     */
     const bool collisionCheck =
-      (0 == strcmp(contacts->contact(i).collision2().c_str(), COLLISION_ITEM)) &&
-      (0 == strcmp(contacts->contact(i).collision1().c_str(), COLLISION_POINT));
+      (0 == strcmp(contacts->contact(i).collision1().c_str(), COLLISION_ITEM)) &&
+      (0 == strcmp(contacts->contact(i).collision2().c_str(), COLLISION_POINT));
 
     
     if (collisionCheck)
@@ -277,7 +277,7 @@ void ArmPlugin::onCollisionMsg(ConstContactsPtr &contacts)
 // upon recieving a new frame, update the AI agent
 bool ArmPlugin::updateAgent()
 {
-  // convert uchar3 input from camera to planar BGR
+  // convert uchar3 input fromecamera to planar BGR
   if( CUDA_FAILED(cudaPackedToPlanarBGR((uchar3*)inputBuffer[1], inputRawWidth, inputRawHeight,
                        inputState->gpuPtr, INPUT_WIDTH, INPUT_HEIGHT)) )
   {
@@ -313,7 +313,7 @@ bool ArmPlugin::updateAgent()
 
     
   /*
-  / TODO - Increase or decrease the joint velocity based on whether the action is even or odd
+  / Increase or decrease the joint velocity based on whether the action is even or odd
   /
   */
   
@@ -345,7 +345,7 @@ bool ArmPlugin::updateAgent()
 #else
   
   /*
-  / TODO - Increase or decrease the joint position based on whether the action is even or odd
+  / Increase or decrease the joint position based on whether the action is even or odd
   /
   */
   float joint = ref[action/2] + ((action & 1) ? actionJointDelta : -actionJointDelta);
@@ -568,11 +568,12 @@ void ArmPlugin::OnUpdate(const common::UpdateInfo& updateInfo)
     const float groundContact = 0.05f;
     
     /*
-    / TODO - set appropriate Reward for robot hitting the ground.
+    / set appropriate Reward for robot hitting the ground.
     /
     */
 
-    const bool checkGroundContact = gripBBox.min.z < groundContact;   
+    const bool checkGroundContact =
+      0.5f * (gripBBox.max.z + gripBBox.min.z) < groundContact;   
     
     if(checkGroundContact)
     {
@@ -585,7 +586,7 @@ void ArmPlugin::OnUpdate(const common::UpdateInfo& updateInfo)
     }
     
     /*
-    / TODO - Issue an interim reward based on the distance to the object
+    / Issue an interim reward based on the distance to the object
     /
     */ 
     
@@ -602,9 +603,9 @@ void ArmPlugin::OnUpdate(const common::UpdateInfo& updateInfo)
         const float distDelta  = lastGoalDistance - distGoal;
 
         // compute the smoothed moving average of the delta of the distance to the goal
-        const float Alpha = 0.1f;
+        const float Alpha = 0.3f;
         avgGoalDelta  = avgGoalDelta * Alpha + distDelta * (1.0 - Alpha);
-        rewardHistory = 0.01 * avgGoalDelta;
+        rewardHistory = avgGoalDelta;
         newReward     = true; 
       }
 
