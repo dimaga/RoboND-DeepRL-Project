@@ -50,8 +50,8 @@
 /
 */
 
-#define REWARD_WIN  0.0f
-#define REWARD_LOSS -0.0f
+#define REWARD_WIN  1.0f
+#define REWARD_LOSS -1.0f
 
 // Define Object Names
 #define WORLD_NAME "arm_world"
@@ -256,20 +256,20 @@ void ArmPlugin::onCollisionMsg(ConstContactsPtr &contacts)
     / TODO - Check if there is collision between the arm and object, then issue learning reward
     /
     */
-    
-    /*
+    const bool collisionCheck =
+      (0 == strcmp(contacts->contact(i).collision2().c_str(), COLLISION_ITEM)) &&
+      (0 == strcmp(contacts->contact(i).collision1().c_str(), COLLISION_POINT));
+
     
     if (collisionCheck)
     {
-      rewardHistory = None;
+      rewardHistory = REWARD_WIN;
 
-      newReward  = None;
-      endEpisode = None;
+      newReward  = true;
+      endEpisode = true;
 
       return;
     }
-    */
-    
   }
 }
 
@@ -571,28 +571,28 @@ void ArmPlugin::OnUpdate(const common::UpdateInfo& updateInfo)
     / TODO - set appropriate Reward for robot hitting the ground.
     /
     */
+
+    const bool checkGroundContact = gripBBox.min.z < groundContact;   
     
-    
-    /*if(checkGroundContact)
+    if(checkGroundContact)
     {
             
       if(DEBUG){printf("GROUND CONTACT, EOE\n");}
 
-      rewardHistory = None;
-      newReward     = None;
-      endEpisode    = None;
+      rewardHistory = REWARD_LOSS;
+      newReward     = true;
+      endEpisode    = true;
     }
-    */
     
     /*
     / TODO - Issue an interim reward based on the distance to the object
     /
     */ 
     
-    /*
     if(!checkGroundContact)
     {
-      const float distGoal = 0; // compute the reward from distance to the goal
+      // compute the reward from distance to the goal
+      const float distGoal = BoxDistance(gripBBox, propBBox);
 
       if(DEBUG){printf("distance('%s', '%s') = %f\n", gripper->GetName().c_str(), prop->model->GetName().c_str(), distGoal);}
 
@@ -602,13 +602,14 @@ void ArmPlugin::OnUpdate(const common::UpdateInfo& updateInfo)
         const float distDelta  = lastGoalDistance - distGoal;
 
         // compute the smoothed moving average of the delta of the distance to the goal
-        avgGoalDelta  = 0.0;
-        rewardHistory = None;
-        newReward     = None; 
+        const float Alpha = 0.1f;
+        avgGoalDelta  = avgGoalDelta * Alpha + distDelta * (1.0 - Alpha);
+        rewardHistory = 0.01 * avgGoalDelta;
+        newReward     = true; 
       }
 
       lastGoalDistance = distGoal;
-    } */
+    }
   }
 
   // issue rewards and train DQN
