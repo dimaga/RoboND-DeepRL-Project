@@ -16,7 +16,7 @@
 #define JOINT_MAX  2.0f
 
 // Turn on velocity based control
-#define VELOCITY_CONTROL false
+#define VELOCITY_CONTROL true
 #define VELOCITY_MIN -0.2f
 #define VELOCITY_MAX  0.2f
 
@@ -39,9 +39,9 @@
 #define INPUT_HEIGHT 64
 #define NUM_ACTIONS (DOF*2)
 #define OPTIMIZER "Adam"
-#define LEARNING_RATE 0.01f
+#define LEARNING_RATE 0.001f
 #define REPLAY_MEMORY 10000
-#define BATCH_SIZE 32
+#define BATCH_SIZE 8
 #define USE_LSTM true
 #define LSTM_SIZE 8
 
@@ -245,8 +245,9 @@ void ArmPlugin::onCollisionMsg(ConstContactsPtr &contacts)
 
   for (unsigned int i = 0; i < contacts->contact_size(); ++i)
   {
-    if( strcmp(contacts->contact(i).collision2().c_str(), COLLISION_FILTER) == 0 )
+    if( strcmp(contacts->contact(i).collision2().c_str(), COLLISION_FILTER) == 0 ) {
       continue;
+    }
 
     if(DEBUG){std::cout << "Collision between[" << contacts->contact(i).collision1()
            << "] and [" << contacts->contact(i).collision2() << "]\n";}
@@ -603,9 +604,9 @@ void ArmPlugin::OnUpdate(const common::UpdateInfo& updateInfo)
         const float distDelta  = lastGoalDistance - distGoal;
 
         // compute the smoothed moving average of the delta of the distance to the goal
-        const float Alpha = 0.3f;
+        const float Alpha = 0.5f;
         avgGoalDelta  = avgGoalDelta * Alpha + distDelta * (1.0 - Alpha);
-        rewardHistory = 0.1f * avgGoalDelta;
+        rewardHistory = avgGoalDelta;
         newReward     = true; 
       }
 
