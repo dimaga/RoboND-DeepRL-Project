@@ -16,7 +16,7 @@
 #define JOINT_MAX  2.0f
 
 // Turn on velocity based control
-#define VELOCITY_CONTROL true
+#define VELOCITY_CONTROL false 
 #define VELOCITY_MIN -0.2f
 #define VELOCITY_MAX  0.2f
 
@@ -42,7 +42,7 @@
 #define LEARNING_RATE 0.001f
 #define REPLAY_MEMORY 10000
 #define BATCH_SIZE 8
-#define USE_LSTM true
+#define USE_LSTM false
 #define LSTM_SIZE 100
 
 /*
@@ -62,7 +62,6 @@
 #define COLLISION_FILTER "ground_plane::link::collision"
 #define COLLISION_ITEM   "tube::tube_link::tube_collision"
 #define COLLISION_POINT  "arm::gripperbase::gripper_link"
-#define COLLISION_MIDDLE "arm::gripper_middle::middle_collision"
 
 // Animation Steps
 #define ANIMATION_STEPS 1000
@@ -260,9 +259,7 @@ void ArmPlugin::onCollisionMsg(ConstContactsPtr &contacts)
     */
     const bool collisionCheck =
       (0 == strcmp(contacts->contact(i).collision1().c_str(), COLLISION_ITEM)) &&
-      (0 == strcmp(contacts->contact(i).collision2().c_str(), COLLISION_POINT) ||
-      0 == strcmp(contacts->contact(i).collision2().c_str(), COLLISION_MIDDLE));
-
+      (0 == strcmp(contacts->contact(i).collision2().c_str(), COLLISION_POINT));
     
     if (collisionCheck)
     {
