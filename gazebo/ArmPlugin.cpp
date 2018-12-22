@@ -27,7 +27,7 @@
 #define DEBUG_DQN false
 #define GAMMA 0.9f
 #define EPS_START 0.9f
-#define EPS_END 0.05f
+#define EPS_END 0.01f
 #define EPS_DECAY 200
 
 /*
@@ -43,7 +43,7 @@
 #define REPLAY_MEMORY 10000
 #define BATCH_SIZE 8
 #define USE_LSTM true
-#define LSTM_SIZE 8
+#define LSTM_SIZE 100
 
 /*
 / Define Reward Parameters
@@ -604,7 +604,7 @@ void ArmPlugin::OnUpdate(const common::UpdateInfo& updateInfo)
         const float distDelta  = lastGoalDistance - distGoal;
 
         // compute the smoothed moving average of the delta of the distance to the goal
-        const float Alpha = 0.5f;
+        const float Alpha = 0.3f;
         avgGoalDelta  = avgGoalDelta * Alpha + distDelta * (1.0 - Alpha);
         rewardHistory = avgGoalDelta;
         newReward     = true; 
