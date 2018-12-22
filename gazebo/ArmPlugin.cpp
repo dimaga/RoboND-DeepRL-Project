@@ -50,7 +50,7 @@
 /
 */
 
-#define REWARD_WIN  10.0f
+#define REWARD_WIN  1.0f
 #define REWARD_LOSS -1.0f
 
 // Define Object Names
@@ -62,6 +62,7 @@
 #define COLLISION_FILTER "ground_plane::link::collision"
 #define COLLISION_ITEM   "tube::tube_link::tube_collision"
 #define COLLISION_POINT  "arm::gripperbase::gripper_link"
+#define COLLISION_MIDDLE "arm::gripper_middle::middle_collision"
 
 // Animation Steps
 #define ANIMATION_STEPS 1000
@@ -259,7 +260,8 @@ void ArmPlugin::onCollisionMsg(ConstContactsPtr &contacts)
     */
     const bool collisionCheck =
       (0 == strcmp(contacts->contact(i).collision1().c_str(), COLLISION_ITEM)) &&
-      (0 == strcmp(contacts->contact(i).collision2().c_str(), COLLISION_POINT));
+      (0 == strcmp(contacts->contact(i).collision2().c_str(), COLLISION_POINT) ||
+      0 == strcmp(contacts->contact(i).collision2().c_str(), COLLISION_MIDDLE));
 
     
     if (collisionCheck)
@@ -606,7 +608,7 @@ void ArmPlugin::OnUpdate(const common::UpdateInfo& updateInfo)
         // compute the smoothed moving average of the delta of the distance to the goal
         const float Alpha = 0.3f;
         avgGoalDelta  = avgGoalDelta * Alpha + distDelta * (1.0 - Alpha);
-        rewardHistory = avgGoalDelta;
+        rewardHistory = 0.1f * avgGoalDelta;
         newReward     = true; 
       }
 
