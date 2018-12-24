@@ -69,9 +69,6 @@
 // Set Debug Mode
 #define DEBUG false
 
-// Lock base rotation DOF (Add dof in header file if off)
-#define LOCKBASE true
-
 
 namespace gazebo
 {

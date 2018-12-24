@@ -33,6 +33,10 @@
 #include <time.h>
 
 
+// Lock base rotation DOF (Add dof in header file if off)
+#define LOCKBASE true
+
+
 namespace gazebo
 {
 
@@ -56,7 +60,11 @@ public:
   void onCameraMsg(ConstImageStampedPtr &_msg);
   void onCollisionMsg(ConstContactsPtr &contacts);
 
-  static const uint32_t DOF  = 2; // active degrees of freedom in the arm
+#if LOCKBASE
+  static const uint32_t DOF = 2; // active degrees of freedom in the arm
+#else
+  static const uint32_t DOF = 3; // active degrees of freedom in the arm
+#endif
 
 private:
   float ref[DOF];     // joint reference positions
