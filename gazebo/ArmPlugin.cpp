@@ -50,7 +50,7 @@
 /
 */
 
-#define REWARD_WIN  1.0f
+#define REWARD_WIN  10.0f
 #define REWARD_LOSS -1.0f
 
 // Define Object Names
