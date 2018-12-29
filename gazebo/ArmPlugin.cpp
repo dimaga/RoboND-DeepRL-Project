@@ -41,7 +41,7 @@
 #define OPTIMIZER "RMSprop"
 #define LEARNING_RATE 0.01f
 #define REPLAY_MEMORY 1000
-#define BATCH_SIZE 8
+#define BATCH_SIZE 32
 #define USE_LSTM false
 #define LSTM_SIZE 100
 
