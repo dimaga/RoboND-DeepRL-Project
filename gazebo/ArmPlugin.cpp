@@ -9,6 +9,7 @@
 
 #include "cudaMappedMemory.h"
 #include "cudaPlanar.h"
+#include <cmath>
 
 #define PI 3.141592653589793238462643383279502884197169f
 
@@ -39,7 +40,7 @@
 #define INPUT_HEIGHT 64
 #define NUM_ACTIONS (DOF*2)
 #define OPTIMIZER "RMSprop"
-#define LEARNING_RATE 0.01f
+#define LEARNING_RATE 0.1f
 #define REPLAY_MEMORY 1000
 #define BATCH_SIZE 32
 #define USE_LSTM false
@@ -255,8 +256,8 @@ void ArmPlugin::onCollisionMsg(ConstContactsPtr &contacts)
     /
     */
     const bool collisionCheck =
-      (0 == strcmp(contacts->contact(i).collision1().c_str(), COLLISION_ITEM)) &&
-      (0 == strcmp(contacts->contact(i).collision2().c_str(), COLLISION_POINT));
+      (0 == strcmp(contacts->contact(i).collision1().c_str(), COLLISION_ITEM));// &&
+//      (0 == strcmp(contacts->contact(i).collision2().c_str(), COLLISION_POINT));
     
     if (collisionCheck)
     {
@@ -602,7 +603,7 @@ void ArmPlugin::OnUpdate(const common::UpdateInfo& updateInfo)
         // compute the smoothed moving average of the delta of the distance to the goal
         const float Alpha = 0.3f;
         avgGoalDelta  = avgGoalDelta * Alpha + distDelta * (1.0 - Alpha);
-        rewardHistory = 0.1f * avgGoalDelta;
+        rewardHistory = std::exp(-distDelta) * avgGoalDelta - 0.01f;
         newReward     = true; 
       }
 
