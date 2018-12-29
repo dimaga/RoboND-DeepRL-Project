@@ -50,7 +50,7 @@
 /
 */
 
-#define REWARD_WIN  10.0f
+#define REWARD_WIN  1.0f
 #define REWARD_LOSS -1.0f
 
 // Define Object Names
@@ -602,7 +602,7 @@ void ArmPlugin::OnUpdate(const common::UpdateInfo& updateInfo)
         // compute the smoothed moving average of the delta of the distance to the goal
         const float Alpha = 0.3f;
         avgGoalDelta  = avgGoalDelta * Alpha + distDelta * (1.0 - Alpha);
-        rewardHistory = 0.1f * avgGoalDelta;
+        rewardHistory = 0.01f * avgGoalDelta;
         newReward     = true; 
       }
 
